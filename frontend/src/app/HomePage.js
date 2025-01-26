@@ -29,12 +29,14 @@ const HomePage = () => {
     gender: '',
     dob: ''
   });
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      console.log('user top', user)
       if (currentUser) {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists()) {
@@ -62,9 +64,49 @@ const HomePage = () => {
     }
   };
 
-  const handleEnroll = (courseId) => {
-    alert(`Enrolled in course with ID: ${courseId}`);
+  const handleEnrollCourse = async (courseId) => {
+    try {
+      const token = user?.stsTokenManager?.accessToken;
+      if (token) {
+        console.log('user mi', user)
+        const response = await fetch(`http://localhost:3001/api/enrollments/${user.uid}/enroll`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ courseId }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          alert('Successfully enrolled in course!');
+        } else {
+          const errorData = await response.json();
+          alert('Error enrolling in course: ' + errorData.message);
+        }
+      } else {
+        console.error('No Firebase token found');
+      }
+    } catch (error) {
+      console.error('Error enrolling in course:', error.message);
+    }
   };
+  
+  const fetchEnrolledCourses = async () => {
+    try {
+      console.log('fetchEnrolledCourses', user.uid)
+      const response = await fetch(`http://localhost:3001/api/enrollments/${user.uid}/enrolled-courses`);
+      if (response.ok) {
+        const data = await response.json();
+        setEnrolledCourses(data.enrolledCourses);
+      } else {
+        console.error('Error fetching enrolled courses');
+      }
+    } catch (error) {
+      console.error('Error fetching enrolled courses:', error.message);
+    }
+  };
+
 
   const handleAddCourse = async (e) => {
     e.preventDefault();
@@ -209,7 +251,6 @@ const HomePage = () => {
       if (newStudentData.firstName && newStudentData.lastName && newStudentData.userName && newStudentData.gender && newStudentData.dob) {
         const token = user?.stsTokenManager?.accessToken;
         if (token) {
-          
           const response = await fetch(`http://localhost:3001/api/students/${editingStudent.id}`, {
             method: 'PUT',
             headers: {
@@ -263,9 +304,9 @@ const HomePage = () => {
           <nav className="col-md-3">
             <ul className="list-group">
               <li className={`list-group-item ${view === 'allCourses' ? 'active' : ''}`} onClick={() => setView('allCourses')}>All Courses</li>
-              <li className={`list-group-item ${view === 'myCourses' ? 'active' : ''}`} onClick={() => setView('myCourses')}>My Courses</li>
+              <li className={`list-group-item ${view === 'myCourses' ? 'active' : ''}`} onClick={() => {setView('myCourses'); fetchEnrolledCourses()}}>My Courses</li>
               {user?.email.startsWith('admin.') && (
-                <li className={`list-group-item ${view === 'students' ? 'active' : ''}`} onClick={() => setView('students')}>All Students</li>
+                <li className={`list-group-item ${view === 'students' ? 'active' : ''}`} onClick={() => {setView('students')} }>All Students</li>
               )}
             </ul>
           </nav>
@@ -355,8 +396,33 @@ const HomePage = () => {
                                 <button className="btn btn-info btn-sm float-end" onClick={() => handleEditCourse(course.id)}>Edit</button>
                               </span>
                             )}
+                            {!user.email.startsWith('admin.') && !enrolledCourses.includes(course.id) &&(
+                              <button
+                                className="btn btn-success btn-sm float-end"
+                                onClick={() => handleEnrollCourse(course.id)}
+                              >
+                                Enroll
+                              </button>
+                            )}
                           </li>
                         ))}
+                        
+                      </ul>
+                    </>
+                  )}
+                  {view === 'myCourses' && (
+                    <>
+                      <h2>My Courses</h2>
+                      <ul className="list-group">
+                        {enrolledCourses.length > 0 ? (
+                          enrolledCourses.map(courseId => (
+                            <li key={courseId} className="list-group-item">
+                              {courses.find(course => course.id === courseId)?.title || 'Course not found'}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="list-group-item">No enrolled courses</li>
+                        )}
                       </ul>
                     </>
                   )}
