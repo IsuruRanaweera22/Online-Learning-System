@@ -4,6 +4,7 @@ const express = require('express');
 const admin = require('./lib/firebaseAdmin'); // Ensure this is the correct path
 const { swaggerUi, swaggerSpec } = require('./swagger'); // Swagger config file
 const courseRoutes = require('./routes/courseRoutes'); // Import the course routes
+const studentRoutes = require('./routes/studentRoutes');
 
 const app = express();
 
@@ -22,7 +23,11 @@ app.get('/', (req, res) => {
 });
 
 // Course routes
-app.use('/api/courses', courseRoutes); // Connect the course routes to the application
+app.use('/api/courses', courseRoutes);
+
+app.use('/api/students', studentRoutes);
+
+
 
 // Listen to the port
 const PORT = process.env.PORT || 3000;
