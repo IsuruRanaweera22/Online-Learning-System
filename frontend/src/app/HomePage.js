@@ -94,7 +94,6 @@ const HomePage = () => {
   
   const fetchEnrolledCourses = async () => {
     try {
-      console.log('fetchEnrolledCourses', user.uid)
       const response = await fetch(`http://localhost:3001/api/enrollments/${user.uid}/enrolled-courses`);
       if (response.ok) {
         const data = await response.json();
@@ -282,9 +281,9 @@ const HomePage = () => {
 
   return (
     <div>
-      <header className="d-flex justify-content-between align-items-center bg-primary p-3 text-white">
+      <header className="d-flex justify-content-between align-items-center text-bold" style={{backgroundColor:'#EADDCA'}}>
         <div>
-          <img src="/logo.png" alt="Logo" style={{ height: '50px' }} />
+          <img src="/logo.jpg" alt="Logo" style={{ height: '70px' }} />
         </div>
         <div>
           {user ? (
@@ -293,7 +292,7 @@ const HomePage = () => {
             </div>
           ) : (
             <div>
-              You are not logged in. (<button className="btn btn-link p-0 text-white" onClick={() => router.push('/login')}>Log in</button>)
+              You are not logged in. (<button className="btn btn-link p-0" onClick={() => router.push('/login')}>Log in</button>)
             </div>
           )}
         </div>
@@ -314,7 +313,7 @@ const HomePage = () => {
           <main className="col-md-9">
             {!user ? (
               <div className="text-center">
-                <h1>Welcome to the Learning Management System of the Faculty of Science, University of Colombo.</h1>
+                <h1>Welcome to the Learning Management System.</h1>
                 <p className="text-muted">Please register or log in to explore courses and other features.</p>
               </div>
             ) : (

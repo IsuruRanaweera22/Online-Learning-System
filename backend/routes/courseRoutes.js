@@ -3,6 +3,38 @@ const adminMiddleware = require('../middleware/adminMiddleware');
 const { addCourse, deleteCourse, updateCourse } = require('../models/courseModel'); // Import the Firestore function
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/courses:
+ *   post:
+ *     summary: Create a new course
+ *     description: Add a new course to the platform
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               duration:
+ *                 type: string
+ *               instructor:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Course added successfully
+ *       400:
+ *         description: Bad request, missing fields
+ *       500:
+ *         description: Error adding course
+ */
+
 // Add a new course (Admin only)
 router.post('/', adminMiddleware, async (req, res) => {
   try {
@@ -21,7 +53,45 @@ router.post('/', adminMiddleware, async (req, res) => {
   }
 });
 
-// Delete a course (Admin only)
+/**
+ * @swagger
+ * /api/courses/{id}:
+ *   delete:
+ *     summary: Delete a course
+ *     description: Deletes a course by its ID
+ *     tags:
+ *       - Courses
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the course to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Course deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 response:
+ *                   type: object
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ */
 router.delete('/:id', adminMiddleware, async (req, res) => {
   try {
     console.log('inside adminMiddleware', req.params.id)
@@ -35,6 +105,65 @@ router.delete('/:id', adminMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/courses/{id}:
+ *   put:
+ *     summary: Update a course
+ *     description: Updates a course's details by its ID
+ *     tags:
+ *       - Courses
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the course to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The new title of the course
+ *               description:
+ *                 type: string
+ *                 description: The new description of the course
+ *               duration:
+ *                 type: string
+ *                 description: The new duration of the course
+ *               instructor:
+ *                 type: string
+ *                 description: The new instructor for the course
+ *     responses:
+ *       200:
+ *         description: Course updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 updatedCourse:
+ *                   type: object
+ *                   description: The updated course details
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ */
 router.put('/:id', adminMiddleware, async (req, res) => {
   try {
     const courseId = req.params.id;

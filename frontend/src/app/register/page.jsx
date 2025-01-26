@@ -53,7 +53,7 @@ const RegisterPage = () => {
     <div className="d-flex justify-content-center align-items-center vh-100" style={{ background: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(10px)' }}>
       <div className="card p-4" style={{ width: '400px' }}>
         <div className="text-center mb-4">
-          <img src="/logo.png" alt="Logo" style={{ height: '50px' }} />
+          <h2 className="text-center mb-4 text-bold" style={{fontSize:'30px'}}>Online Learning Platform</h2>
         </div>
         <form onSubmit={handleRegister}>
           <div className="mb-3">
@@ -128,7 +128,16 @@ const RegisterPage = () => {
           </div>
           <button type="submit" className="btn btn-primary w-100">Register</button>
           <div className="text-center mt-2">
-            Already have an account? <button className="btn btn-link" onClick={() => router.push('/login')}>Log in</button>
+            Already have an account? <button 
+              type="button" 
+              className="btn btn-link" 
+              onClick={(e) => {
+                e.preventDefault(); // Prevent default form submission
+                router.push('/login');
+              }}
+            >
+              Log in
+            </button>
           </div>
         </form>
       </div>

@@ -11,13 +11,26 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000', // Replace with your API base URL
+        url: 'http://localhost:3001', 
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
       },
     ],
   },
-  apis: ['./routes/*.js'], // Path to the API docs
+  apis: ['./routes/*.js'], // Path to your API docs
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-
 module.exports = { swaggerUi, swaggerSpec };
